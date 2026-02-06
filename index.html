@@ -14,13 +14,10 @@
         display: flex;
         justify-content: center;
         align-items: center;
-
-        /* Gradient พาเลตใหม่ */
         background: linear-gradient(180deg, #09637E, #088395, #7AB2B2, #EBF4F6);
         overflow: hidden;
     }
 
-    /* หิมะแบบ ultra-light สำหรับมือถือเก่า */
     .snow {
         position: fixed;
         top: 0;
@@ -45,7 +42,6 @@
         to { transform: translateY(110vh); }
     }
 
-    /* กล่องแบบโทนเดียวกับพาเลต */
     .box {
         position: relative;
         z-index: 5;
@@ -63,13 +59,72 @@
         color: #09637E;
     }
 
-    input {
+    .input-group {
         width: 90%;
+        margin: 10px auto;
+        position: relative;
+    }
+
+    input {
+        width: 100%;
         padding: 10px;
-        margin: 10px 0;
         border-radius: 12px;
         border: 2px solid #088395;
         font-size: 15px;
+    }
+
+    /* ★ dropdown ใหม่ — โทน White Out Survival ★ */
+    .dropdown {
+        position: absolute;
+        top: 100%;
+        width: 100%;
+        border-radius: 12px;
+        margin-top: 4px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 0 12px rgba(0,0,0,0.25);
+        border: 2px solid #7AB2B2;
+        backdrop-filter: blur(5px);
+        max-height: 160px;
+        overflow-y: auto;
+        display: none;
+        z-index: 25;
+    }
+    .dropdown div {
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 1px solid #E6F2F2;
+    }
+    .dropdown div:hover {
+        background: #BEE3E3;
+    }
+
+    /* ปุ่มล้างประวัติช่อง */
+    .clear-btn {
+        text-align: center;
+        padding: 8px;
+        font-size: 13px;
+        cursor: pointer;
+        background: #ffcccc;
+        border-radius: 0 0 10px 10px;
+    }
+    .clear-btn:hover {
+        background: #ffb3b3;
+    }
+
+    /* ปุ่มลบทั้งหมด */
+    .clear-all {
+        margin-top: 10px;
+        padding: 10px;
+        width: 80%;
+        background: #c0392b;
+        color: white;
+        border-radius: 14px;
+        font-size: 15px;
+        border: none;
+        cursor: pointer;
+    }
+    .clear-all:hover {
+        background: #962d22;
     }
 
     button {
@@ -101,53 +156,142 @@
 
 <body>
 
-<!-- หิมะ -->
 <div class="snow" id="snowArea"></div>
 
-<!-- กล่องหลัก -->
 <div class="box">
     <h2>White Out Survival</h2>
 
-    <input type="number" id="value1" placeholder="จำนวนทหารธนูทั้งหมด">
-    <input type="number" id="value2" placeholder="ความจุเต็มของทีม">
-    <input type="number" id="value3" placeholder="ความจุทีมซิริล">
-    <input type="number" id="value4" placeholder="ความจุลิงหิมะ">
+    <div class="input-group">
+        <input type="number" id="value1" placeholder="จำนวนทหารธนูทั้งหมด"
+               onfocus="showDropdown('value1')" oninput="showDropdown('value1')">
+        <div class="dropdown" id="dropdown_value1"></div>
+    </div>
+
+    <div class="input-group">
+        <input type="number" id="value2" placeholder="ความจุเต็มของทีม"
+               onfocus="showDropdown('value2')" oninput="showDropdown('value2')">
+        <div class="dropdown" id="dropdown_value2"></div>
+    </div>
+
+    <div class="input-group">
+        <input type="number" id="value3" placeholder="ความจุทีมซิริล"
+               onfocus="showDropdown('value3')" oninput="showDropdown('value3')">
+        <div class="dropdown" id="dropdown_value3"></div>
+    </div>
+
+    <div class="input-group">
+        <input type="number" id="value4" placeholder="ความจุลิงหิมะ"
+               onfocus="showDropdown('value4')" oninput="showDropdown('value4')">
+        <div class="dropdown" id="dropdown_value4"></div>
+    </div>
 
     <button onclick="calculate()">กดเพื่อคำนวณ</button>
+
+    <!-- ปุ่มลบทั้งหมด -->
+    <button class="clear-all" onclick="clearAllHistory()">ลบประวัติทั้งหมด</button>
 
     <div class="result" id="resultBox"></div>
 </div>
 
 <script>
-/* ฟังก์ชันคำนวณ */
-function calculate() {
-    let v1 = parseFloat(document.getElementById("value1").value) || 0;
-    let v2 = parseFloat(document.getElementById("value2").value) || 0;
-    let v3 = parseFloat(document.getElementById("value3").value) || 0;
-    let v4 = parseFloat(document.getElementById("value4").value) || 0;
+/* โหลดประวัติ */
+function loadHistory(id) {
+    return JSON.parse(localStorage.getItem("history_" + id)) || [];
+}
 
-    let result = ((v1 / 6) * 100) / (v2 + v3 + v4);
+/* บันทึกประวัติ */
+function saveHistory(id, value) {
+    if (!value) return;
+    let history = loadHistory(id);
+
+    if (!history.includes(value)) history.unshift(value);
+    history = history.slice(0, 10);
+
+    localStorage.setItem("history_" + id, JSON.stringify(history));
+}
+
+/* ล้างประวัติแต่ละช่อง */
+function clearHistory(id) {
+    localStorage.removeItem("history_" + id);
+    showDropdown(id);
+}
+
+/* ลบประวัติทั้งหมด */
+function clearAllHistory() {
+    ["value1","value2","value3","value4"].forEach(id => {
+        localStorage.removeItem("history_" + id);
+    });
+    document.querySelectorAll(".dropdown").forEach(d => d.style.display="none");
+    alert("ลบประวัติทั้งหมดแล้ว");
+}
+
+/* แสดง dropdown */
+function showDropdown(id) {
+    let dropdown = document.getElementById("dropdown_" + id);
+    let input = document.getElementById(id);
+    let history = loadHistory(id);
+
+    dropdown.innerHTML = "";
+    dropdown.style.display = "none";
+
+    if (history.length > 0) {
+        history.forEach(item => {
+            let div = document.createElement("div");
+            div.textContent = item;
+            div.onclick = () => {
+                input.value = item;
+                dropdown.style.display = "none";
+            };
+            dropdown.appendChild(div);
+        });
+
+        // ปุ่มลบประวัติช่องนี้
+        let clearBtn = document.createElement("div");
+        clearBtn.className = "clear-btn";
+        clearBtn.textContent = "ลบประวัติช่องนี้";
+        clearBtn.onclick = () => clearHistory(id);
+        dropdown.appendChild(clearBtn);
+
+        dropdown.style.display = "block";
+    }
+}
+
+/* คลิกนอก dropdown → ปิด */
+document.addEventListener("click", e => {
+    if (!e.target.closest(".input-group")) {
+        document.querySelectorAll(".dropdown")
+            .forEach(d => d.style.display = "none");
+    }
+});
+
+/* คำนวณ */
+function calculate() {
+    let v1 = document.getElementById("value1").value;
+    let v2 = document.getElementById("value2").value;
+    let v3 = document.getElementById("value3").value;
+    let v4 = document.getElementById("value4").value;
+
+    saveHistory("value1", v1);
+    saveHistory("value2", v2);
+    saveHistory("value3", v3);
+    saveHistory("value4", v4);
+
+    let total = ((v1 / 6) * 100) / (parseFloat(v2)+parseFloat(v3)+parseFloat(v4));
 
     document.getElementById("resultBox").style.display = "block";
     document.getElementById("resultBox").innerHTML =
-        "ผลลัพธ์ = " + Math.floor(result) + "%";
+        "ผลลัพธ์ = " + Math.floor(total) + "%";
 }
 
-
-/* หิมะเบาๆ ไม่กินเครื่อง */
+/* หิมะ */
 let snowArea = document.getElementById("snowArea");
-
-for (let i = 0; i < 50; i++) {  // ลดจำนวนเพื่อให้ลื่น
+for (let i = 0; i < 50; i++) {
     let s = document.createElement("span");
-
     s.style.left = Math.random() * 100 + "%";
-    
-    let size = Math.random() * 4 + 3;     // ลดขนาดลงเพื่อความเร็ว
+    let size = Math.random() * 4 + 3;
     s.style.width = size + "px";
     s.style.height = size + "px";
-
     s.style.animationDuration = (Math.random() * 6 + 4) + "s";
-
     snowArea.appendChild(s);
 }
 </script>

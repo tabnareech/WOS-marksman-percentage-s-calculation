@@ -1,49 +1,98 @@
-
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>White Out Survival Calculator</title>
 
 <style>
+    /* พื้นหลังโทนเกม */
     body {
-        background: #7AB2B2;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
         font-family: "Prompt", sans-serif;
         display: flex;
         justify-content: center;
-        padding-top: 50px;
+        align-items: center;
+        background: url('https://images.unsplash.com/photo-1608889175123-67b43b77fff4') center/cover no-repeat fixed;
+        overflow: hidden;
     }
-    .box {
+
+    /* เลเยอร์หิมะ */
+    .snow {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 1;
+    }
+    .snow span {
+        position: absolute;
+        top: -10px;
+        width: 8px;
+        height: 8px;
         background: white;
+        border-radius: 50%;
+        opacity: 0.9;
+        filter: blur(1px);
+        animation: fall linear infinite;
+    }
+    @keyframes fall {
+        to {
+            transform: translateY(110vh);
+        }
+    }
+
+    /* กล่อง UI โทนเกม */
+    .box {
+        position: relative;
+        z-index: 5;
+        background: rgba(255, 255, 255, 0.85);
         width: 350px;
         padding: 25px;
         border-radius: 20px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        box-shadow: 0 0 20px rgba(0,0,0,0.3);
         text-align: center;
+        backdrop-filter: blur(5px);
     }
+
     h2 {
-        color: #09637E;
+        color: #093B55;
+        margin-bottom: 15px;
     }
+
     input {
         width: 90%;
-        padding: 10px;
+        padding: 12px;
         margin: 10px 0;
-        border-radius: 10px;
-        border: 2px solid #088395;
+        border-radius: 12px;
+        border: 2px solid #0A6A8A;
         font-size: 16px;
     }
+
     button {
         margin-top: 15px;
         padding: 12px 20px;
-        background: #09637E;
+        background: #0A6A8A;
         border: none;
         color: white;
         border-radius: 15px;
         font-size: 16px;
         cursor: pointer;
+        width: 80%;
     }
     button:hover {
-        background: #7AB2B2;
+        background: #5FB3C7;
     }
+
     .result {
         margin-top: 20px;
         padding: 15px;
-        background: #7AB2B2;
+        background: #5FB3C7;
         border-radius: 15px;
         font-size: 18px;
         color: #000 ;
@@ -53,6 +102,11 @@
 </head>
 
 <body>
+
+<!-- หิมะ -->
+<div class="snow" id="snowArea"></div>
+
+<!-- กล่องหลัก -->
 <div class="box">
     <h2> White Out Survival </h2>
 
@@ -63,10 +117,11 @@
 
     <button onclick="calculate()">กดเพื่อคำนวณ</button>
 
-    <div class="result" id="resultBox"> เปอร์เซ็นต์ทหารธนูจะอยู่ที่นี่ค่ะ </div>
+    <div class="result" id="resultBox">เปอร์เซ็นต์ทหารธนูจะอยู่ที่นี่ค่ะ</div>
 </div>
 
 <script>
+/* คำนวณ */
 function calculate() {
     let v1 = parseFloat(document.getElementById("value1").value) || 0;
     let v2 = parseFloat(document.getElementById("value2").value) || 0;
@@ -75,12 +130,33 @@ function calculate() {
 
     let result = ((v1 / 6) * 100) / (v2 + v3 + v4);
 
-    //
     document.getElementById("resultBox").style.display = "block";
-
     document.getElementById("resultBox").innerHTML =
         "ผลลัพธ์ = " + result.toFixed(2) + "%";
 }
+
+
+/* หิมะตกแบบธรรมชาติ: เร็วบ้างช้าบ้าง ลมพัดซ้ายขวา */
+let snow = document.getElementById("snowArea");
+
+for (let i = 0; i < 80; i++) {
+    let span = document.createElement("span");
+
+    // ตำแหน่งหิมะแต่ละเม็ด
+    span.style.left = Math.random() * 100 + "%";
+
+    // สุ่มขนาดเม็ดหิมะ
+    let size = Math.random() * 6 + 4;
+    span.style.width = size + "px";
+    span.style.height = size + "px";
+
+    // สุ่มเวลาให้ตกเร็ว–ช้า
+    let duration = Math.random() * 10 + 5;
+    span.style.animationDuration = duration + "s";
+
+    snow.appendChild(span);
+}
 </script>
 
-
+</body>
+</html>

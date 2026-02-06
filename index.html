@@ -194,6 +194,7 @@
 </div>
 
 <script>
+
 /* โหลดประวัติ */
 function loadHistory(id) {
     return JSON.parse(localStorage.getItem("history_" + id)) || [];
@@ -210,58 +211,80 @@ function saveHistory(id, value) {
     localStorage.setItem("history_" + id, JSON.stringify(history));
 }
 
-/* ล้างประวัติแต่ละช่อง */
-function clearHistory(id) {
-    localStorage.removeItem("history_" + id);
-    showDropdown(id);
-}
+/* สร้าง dropdown ที่ body เพื่อไม่ให้โดนตัด */
+let dropdown = document.createElement("div");
+dropdown.id = "globalDropdown";
+dropdown.style.position = "absolute";
+dropdown.style.display = "none";
+dropdown.style.background = "rgba(255,255,255,0.95)";
+dropdown.style.border = "2px solid #7AB2B2";
+dropdown.style.borderRadius = "12px";
+dropdown.style.boxShadow = "0 0 10px rgba(0,0,0,0.25)";
+dropdown.style.maxHeight = "160px";
+dropdown.style.overflowY = "auto";
+dropdown.style.zIndex = 9999;
+document.body.appendChild(dropdown);
 
-/* ลบประวัติทั้งหมด */
-function clearAllHistory() {
-    ["value1","value2","value3","value4"].forEach(id => {
-        localStorage.removeItem("history_" + id);
-    });
-    document.querySelectorAll(".dropdown").forEach(d => d.style.display="none");
-    alert("ลบประวัติทั้งหมดแล้ว");
-}
-
-/* แสดง dropdown */
+/* เปิด dropdown */
 function showDropdown(id) {
-    let dropdown = document.getElementById("dropdown_" + id);
     let input = document.getElementById(id);
+    let rect = input.getBoundingClientRect();
     let history = loadHistory(id);
 
     dropdown.innerHTML = "";
-    dropdown.style.display = "none";
 
-    if (history.length > 0) {
-        history.forEach(item => {
-            let div = document.createElement("div");
-            div.textContent = item;
-            div.onclick = () => {
-                input.value = item;
-                dropdown.style.display = "none";
-            };
-            dropdown.appendChild(div);
-        });
-
-        // ปุ่มลบประวัติช่องนี้
-        let clearBtn = document.createElement("div");
-        clearBtn.className = "clear-btn";
-        clearBtn.textContent = "ลบประวัติช่องนี้";
-        clearBtn.onclick = () => clearHistory(id);
-        dropdown.appendChild(clearBtn);
-
-        dropdown.style.display = "block";
+    if (history.length === 0) {
+        dropdown.style.display = "none";
+        return;
     }
+
+    history.forEach(item => {
+        let div = document.createElement("div");
+        div.textContent = item;
+        div.style.padding = "10px";
+        div.style.cursor = "pointer";
+        div.style.borderBottom = "1px solid #E6F2F2";
+
+        div.onclick = () => {
+            input.value = item;
+            dropdown.style.display = "none";
+        };
+
+        dropdown.appendChild(div);
+    });
+
+    /* ปุ่มล้างประวัติช่องนี้ */
+    let clearBtn = document.createElement("div");
+    clearBtn.textContent = "ลบประวัติช่องนี้";
+    clearBtn.style.padding = "10px";
+    clearBtn.style.background = "#ffcccc";
+    clearBtn.style.cursor = "pointer";
+    clearBtn.style.textAlign = "center";
+
+    clearBtn.onclick = () => {
+        localStorage.removeItem("history_" + id);
+        dropdown.style.display = "none";
+    };
+
+    dropdown.appendChild(clearBtn);
+
+    dropdown.style.left = rect.left + "px";
+    dropdown.style.top = rect.bottom + window.scrollY + "px";
+    dropdown.style.width = rect.width + "px";
+    dropdown.style.display = "block";
 }
 
-/* คลิกนอก dropdown → ปิด */
-document.addEventListener("click", e => {
-    if (!e.target.closest(".input-group")) {
-        document.querySelectorAll(".dropdown")
-            .forEach(d => d.style.display = "none");
-    }
+/* ปิด dropdown เมื่อคลิกด้านนอก */
+document.addEventListener("click", (e) => {
+    if (!e.target.closest("input")) dropdown.style.display = "none";
+});
+
+/* ผูก event ทุกช่อง */
+["value1","value2","value3","value4"].forEach(id => {
+    let input = document.getElementById(id);
+
+    input.addEventListener("focus", () => showDropdown(id));
+    input.addEventListener("click", () => showDropdown(id));
 });
 
 /* คำนวณ */
@@ -283,6 +306,15 @@ function calculate() {
         "ผลลัพธ์ = " + Math.floor(total) + "%";
 }
 
+/* ลบทั้งหมด */
+function clearAllHistory() {
+    ["value1","value2","value3","value4"].forEach(id => {
+        localStorage.removeItem("history_" + id);
+    });
+    dropdown.style.display = "none";
+    alert("ลบประวัติทั้งหมดแล้ว");
+}
+
 /* หิมะ */
 let snowArea = document.getElementById("snowArea");
 for (let i = 0; i < 50; i++) {
@@ -294,7 +326,9 @@ for (let i = 0; i < 50; i++) {
     s.style.animationDuration = (Math.random() * 6 + 4) + "s";
     snowArea.appendChild(s);
 }
+
 </script>
 
 </body>
 </html>
+

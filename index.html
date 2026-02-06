@@ -132,7 +132,7 @@ function calculate() {
 
     document.getElementById("resultBox").style.display = "block";
     document.getElementById("resultBox").innerHTML =
-        "ผลลัพธ์ = " + result.toFixed(2) + "%";
+        "ผลลัพธ์ = " + Math.floor(result) + "%";
 }
 
 
@@ -160,3 +160,4 @@ for (let i = 0; i < 80; i++) {
 
 </body>
 </html>
+

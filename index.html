@@ -75,8 +75,12 @@ function calculate() {
 
     let result = ((v1 / 6) * 100) / (v2 + v3 + v4);
 
+    //
+    document.getElementById("resultBox").style.display = "block";
+
     document.getElementById("resultBox").innerHTML =
         "ผลลัพธ์ = " + result.toFixed(2) + "%";
 }
 </script>
+
 

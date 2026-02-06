@@ -1,0 +1,81 @@
+
+
+<style>
+    body {
+        background: #7AB2B2;
+        font-family: "Prompt", sans-serif;
+        display: flex;
+        justify-content: center;
+        padding-top: 50px;
+    }
+    .box {
+        background: white;
+        width: 350px;
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    h2 {
+        color: #09637E;
+    }
+    input {
+        width: 90%;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 10px;
+        border: 2px solid #088395;
+        font-size: 16px;
+    }
+    button {
+        margin-top: 15px;
+        padding: 12px 20px;
+        background: #09637E;
+        border: none;
+        color: white;
+        border-radius: 15px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #7AB2B2;
+    }
+    .result {
+        margin-top: 20px;
+        padding: 15px;
+        background: #7AB2B2;
+        border-radius: 15px;
+        font-size: 18px;
+        color: blue ;
+        display: none;
+    }
+</style>
+</head>
+
+<body>
+<div class="box">
+    <h2> White Out Survival </h2>
+
+    <input type="number" id="value1" placeholder="จำนวนทหารธนูทั้งหมด">
+    <input type="number" id="value2" placeholder="ความจุเต็มของทีม">
+    <input type="number" id="value3" placeholder="ความจุทีมซิริล">
+    <input type="number" id="value4" placeholder="ความจุลิงหิมะ">
+
+    <button onclick="calculate()">กดเพื่อคำนวณ</button>
+
+    <div class="result" id="resultBox"> เปอร์เซ็นต์ทหารธนูจะอยู่ที่นี่ค่ะ </div>
+</div>
+
+<script>
+function calculate() {
+    let v1 = parseFloat(document.getElementById("value1").value) || 0;
+    let v2 = parseFloat(document.getElementById("value2").value) || 0;
+    let v3 = parseFloat(document.getElementById("value3").value) || 0;
+    let v4 = parseFloat(document.getElementById("value4").value) || 0;
+
+    let result = ((v1 / 6) * 100) / (v2 + v3 + v4);
+
+    document.getElementById("resultBox").innerHTML =
+        "ผลลัพธ์ = " + result.toFixed(2) + "%";
+}
+</script>
